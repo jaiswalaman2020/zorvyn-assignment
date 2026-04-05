@@ -554,14 +554,32 @@ All inputs are validated using Zod schemas. Validation errors include field-leve
    - No manual migration steps needed
    - Your backend will be live at: `https://your-service-name.onrender.com`
 
-## Development Assumptions
+⚠️ **Cold Start Note:** On Render's free tier, the first request takes 30-40 seconds to respond (service spins down when inactive). Subsequent requests are fast (< 1 second). This is expected behavior!
 
-1. **Authentication**: Mock JWT implementation suitable for development/demo
-2. **Database**: PostgreSQL with Prisma ORM
-3. **Soft Deletes**: Financial records use soft delete for data integrity
-4. **Pagination**: Limit/offset based pagination
-5. **Access Control**: Role-based with middleware and service-layer enforcement
-6. **Error Handling**: Centralized error middleware with consistent response format
+## Technical Decisions and Trade-offs
+
+### Framework & Language
+We chose **Node.js + Express.js + TypeScript** for rapid development with strong type safety. Express provides a lightweight, well-documented framework ideal for REST APIs, while TypeScript catches errors at compile-time. Trade-off: TypeScript adds compilation overhead, and Node.js is slower than compiled languages (Go/Rust) for CPU-intensive tasks.
+
+### Database & ORM
+We selected **PostgreSQL with Prisma ORM** for strong data integrity (ACID transactions, referential constraints) and type-safe queries. Prisma auto-generates type-safe clients and handles migrations elegantly. Trade-off: Less flexible than NoSQL for unstructured data, and complex queries require raw SQL.
+
+### Authentication
+We implemented **JWT (JSON Web Tokens)** for stateless, scalable authentication without server-side session storage—ideal for distributed systems. Trade-off: No built-in logout mechanism (tokens valid until expiry), and token revocation requires additional infrastructure.
+
+### Architecture
+We used a **3-layer Service Pattern** (Controllers → Services → Database) for clean separation of concerns and testability. RBAC is enforced at both middleware and service layers for defense-in-depth security. Trade-off: Extra layer adds complexity, and redundant permission checks impact performance slightly.
+
+### Data Handling
+We used **Prisma.Decimal** for financial amounts to ensure precision (no floating-point rounding errors) and **soft deletes** (isDeleted flag) for data recovery and audit trails. Trade-off: Decimal is slower than native numbers, and soft deletes require filtering logic in every query.
+
+### Pagination & Validation
+We chose **limit/offset pagination** for simplicity and **Zod schemas** for runtime validation. Trade-off: Limit/offset is inefficient at scale (cursor-based would be better), and Zod validation adds request latency.
+
+### Deployment
+We deploy on **Render with Supabase** for zero server management and automatic migrations on startup. Trade-off: Free tier has cold starts (30-60s), and vendor lock-in limits portability.
+
+**Summary:** All decisions prioritize **type-safety, correctness, and developer productivity** over raw performance, making this ideal for production-ready demo applications.
 
 ## Troubleshooting
 
@@ -580,6 +598,15 @@ All inputs are validated using Zod schemas. Validation errors include field-leve
 
 - Change `PORT` in `.env`
 - Or kill process: `lsof -i :3000 | kill <PID>`
+
+### Render Deployment: First Request Takes 30-40 Seconds
+
+On Render's free tier, services spin down after 15 minutes of inactivity. The first request takes **30-40 seconds** to wake up the service. This is **normal and expected behavior**.
+
+**Solution:**
+- ✅ Wait 30-40 seconds for the first request to complete
+- ✅ Subsequent requests will be fast (< 1 second)
+- ✅ Consider upgrading to Render paid tier ($7+/month) if you need instant responses
 
 ## API Testing
 

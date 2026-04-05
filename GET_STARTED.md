@@ -328,14 +328,18 @@ https://zorvyn-finance-api.onrender.com
 
 ### Step 7: Test Your Deployment
 
+⚠️ **IMPORTANT: First Request Will Take 30-40 Seconds**
+
+On Render's free tier, the service spins down when inactive. The first request takes 30-40 seconds to start. **This is normal!** Wait for the service to boot up, then subsequent requests will be fast.
+
 ```bash
 # Replace with your Render URL
 RENDER_URL="https://zorvyn-finance-api.onrender.com"
 
-# Health check
+# Health check (wait 30-40 seconds for first request)
 curl $RENDER_URL/health
 
-# Login
+# Once it responds, login:
 curl -X POST $RENDER_URL/api/auth/login \
   -H "Content-Type: application/json" \
   -d '{
@@ -343,6 +347,9 @@ curl -X POST $RENDER_URL/api/auth/login \
     "password": "admin123"
   }'
 ```
+
+**Expected first response time:** 30-40 seconds
+**Subsequent requests:** < 1 second
 
 ### Faster Alternative: Use Render with Deploy Script
 
@@ -393,10 +400,24 @@ Error: ECONNREFUSED (connecting to Supabase)
 - Verify `NODE_ENV=production`
 - Ensure database is accessible
 
-**Cold Starts (Free Tier):**
-- Render free tier spins down unused services
-- First request takes 30-60 seconds
-- Upgrade to paid for production
+**Cold Starts (Free Tier) - First Request Slow:**
+- Render free tier spins down inactive services after 15 minutes
+- **First request takes 30-40 seconds** to wake up the service ⏳
+- **This is normal and expected!** Wait for the service to boot
+- Subsequent requests are fast (< 1 second)
+- To avoid cold starts: upgrade to Render paid tier ($7+/month)
+
+**Solution:**
+```bash
+# First request - wait patiently
+curl https://your-service.onrender.com/health
+# Wait 30-40 seconds...
+
+# After first response, subsequent requests are instant
+curl https://your-service.onrender.com/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"admin@finance.com","password":"admin123"}'
+```
 
 ### Environment Variables Reference
 
