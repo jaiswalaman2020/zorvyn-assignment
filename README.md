@@ -530,25 +530,30 @@ All inputs are validated using Zod schemas. Validation errors include field-leve
 
 ## Deployment
 
-### Deploy to Railway with Supabase
+### Deploy to Render with Supabase
 
 1. **Create Database on Supabase**
    - Go to supabase.com and create a PostgreSQL database
    - Go to Project Settings → Database → Connection String
    - Copy the connection string (STDBY or Direct connection)
 
-2. **Deploy to Railway**
+2. **Deploy to Render**
    - Push code to GitHub
-   - Connect Railway to GitHub repository
-   - Set environment variables in Railway:
+   - Connect Render to GitHub repository (render.com)
+   - Create Web Service with settings:
+     - **Build Command**: `npm install && npm run build`
+     - **Start Command**: `npm start`
+   - Add environment variables:
      - `DATABASE_URL`: Your Supabase connection string
      - `JWT_SECRET`: Strong random string
      - `NODE_ENV`: "production"
      - `PORT`: 3000
 
 3. **Run Migrations**
-   - Connect to Railway container
-   - Run: `npm run prisma:migrate -- --skip-generate`
+   - After deployment, access Shell tab in Render
+   - Run: `npm run prisma:migrate -- --skip-generate && npm run seed`
+
+Your backend will be live at: `https://your-service-name.onrender.com`
 
 ## Development Assumptions
 

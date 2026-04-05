@@ -242,14 +242,185 @@ See `README.md` for:
 - Deployment instructions
 - Additional features
 
-## 🚢 Deploy to Railway
+## 🚀 Deploy to Render
 
-1. Push code to GitHub
-2. Connect GitHub repo to Railway
-3. Add environment variables:
-   - `DATABASE_URL` - Your Supabase connection string (from Project Settings → Database → Connection String)
-   - `JWT_SECRET` - Generate strong random string
-   - `NODE_ENV` - Set to "production"
-   - `PORT` - Railway will set this automatically
+### Prerequisites
+- GitHub account with code pushed
+- Render account (free at render.com)
+- Supabase database connection string
 
-That's it! Your backend is deployed! 🎉
+### Step 1: Create New Web Service on Render
+
+1. Go to [render.com](https://render.com)
+2. Sign in with GitHub
+3. Click **"New +"** → **"Web Service"**
+4. Select your `Zorvyn` repository
+5. Click **"Connect"**
+
+### Step 2: Configure Deployment Settings
+
+Fill in the deployment form:
+
+| Setting | Value |
+|---------|-------|
+| **Name** | `zorvyn-finance-api` |
+| **Environment** | `Node` |
+| **Region** | Choose closest to you |
+| **Branch** | `main` |
+| **Build Command** | `npm install && npm run build` |
+| **Start Command** | `npm start` |
+
+### Step 3: Add Environment Variables
+
+Scroll down to **Environment** section and add these variables:
+
+```
+DATABASE_URL=postgresql://postgres:PASSWORD@db.xxxxx.supabase.co:5432/postgres
+JWT_SECRET=your-random-secret-key-here
+NODE_ENV=production
+PORT=3000
+```
+
+**To get Supabase CONNECTION_URL:**
+- Go to Supabase Dashboard
+- Click your project → **Settings** → **Database**
+- Copy the connection string under "Connection String"
+- Replace `[YOUR-PASSWORD]` with your actual database password
+
+### Step 4: Create Service
+
+1. Click **"Create Web Service"**
+2. Render will start building your app
+3. Wait for the build to complete (3-5 minutes)
+
+### Step 5: Run Migrations After Deploy
+
+Once deployment completes:
+
+1. Click your service → **Shell** tab (if available)
+2. OR use the Deploy Hook feature:
+   - Go to **Settings** → **Deploy Hook**
+   - Create a custom build command
+
+**Manual Migration (if Shell not available):**
+
+Create a `scripts/deploy.sh` file and commit it:
+
+```bash
+#!/bin/bash
+npm run prisma:migrate -- --skip-generate
+npm run seed
+npm start
+```
+
+Then update **Start Command** to:
+```bash
+chmod +x scripts/deploy.sh && ./scripts/deploy.sh
+```
+
+**Alternative: Run migrations via API**
+
+After deployment is live, run migrations locally:
+
+```bash
+RENDER_DATABASE_URL="your-render-database-url" npm run prisma:migrate -- --skip-generate
+```
+
+### Step 6: Get Your Live URL
+
+Your app will be available at:
+```
+https://zorvyn-finance-api.onrender.com
+```
+
+(Render generates the exact URL - check your dashboard)
+
+### Step 7: Test Your Deployment
+
+```bash
+# Replace with your Render URL
+RENDER_URL="https://zorvyn-finance-api.onrender.com"
+
+# Health check
+curl $RENDER_URL/health
+
+# Login
+curl -X POST $RENDER_URL/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "admin@finance.com",
+    "password": "admin123"
+  }'
+```
+
+### Faster Alternative: Use Render with Deploy Script
+
+Update your **Start Command** to:
+
+```bash
+npm run prisma:migrate -- --skip-generate && npm run seed && npm start
+```
+
+This runs migrations and seeds on every deployment.
+
+### Render Deployment Summary
+
+| Step | Action |
+|------|--------|
+| 1 | Connect GitHub repo to Render |
+| 2 | Set Build: `npm install && npm run build` |
+| 3 | Set Start: `npm start` |
+| 4 | Add 4 environment variables |
+| 5 | Create service and wait for build |
+| 6 | Run migrations if needed |
+| 7 | Test with curl or Postman |
+
+### Troubleshooting Render Deployment
+
+**Build Failed:**
+- Check **Logs** tab for error details
+- Ensure all dependencies in `package.json`
+- Run `npm install` locally to verify
+
+**Database Connection Error:**
+```
+Error: ECONNREFUSED (connecting to Supabase)
+```
+- Verify `DATABASE_URL` format
+- Add Render's IP to Supabase whitelist (Supabase → Settings → Network)
+- Test connection locally first
+
+**Migrations Not Running:**
+- Use the **Shell** tab to run manually:
+  ```bash
+  npm run prisma:migrate -- --skip-generate
+  npm run seed
+  ```
+
+**Service Keeps Crashing:**
+- Check logs for errors
+- Verify `NODE_ENV=production`
+- Ensure database is accessible
+
+**Cold Starts (Free Tier):**
+- Render free tier spins down unused services
+- First request takes 30-60 seconds
+- Upgrade to paid for production
+
+### Environment Variables Reference
+
+```env
+# Database (from Supabase)
+DATABASE_URL=postgresql://postgres:YOUR_PASSWORD@db.xxxxx.supabase.co:5432/postgres
+
+# JWT Secret (random string, min 32 chars)
+JWT_SECRET=your-super-secret-jwt-key-at-least-32-characters-long
+
+# Node Environment
+NODE_ENV=production
+
+# Port (Render sets automatically)
+PORT=3000
+```
+
+That's it! Your backend is deployed on Render! 🎉
