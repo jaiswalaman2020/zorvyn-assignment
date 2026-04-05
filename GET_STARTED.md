@@ -267,8 +267,8 @@ Fill in the deployment form:
 | **Environment** | `Node` |
 | **Region** | Choose closest to you |
 | **Branch** | `main` |
-| **Build Command** | `npm install && npm run prisma:generate && npm run build` |
-| **Start Command** | `npm start` |
+| **Build Command** | `npm install --include=dev && npm run prisma:generate && npm run build` |
+| **Start Command** | `npm run prisma:migrate -- --skip-generate && npm run seed && npm start` |
 
 ### Step 3: Add Environment Variables
 
@@ -295,35 +295,26 @@ PORT=3000
 
 ### Step 5: Run Migrations After Deploy
 
-Once deployment completes:
+**Option 1: Automatic Migrations (Recommended for Free Tier)**
 
-1. Click your service → **Shell** tab (if available)
-2. OR use the Deploy Hook feature:
-   - Go to **Settings** → **Deploy Hook**
-   - Create a custom build command
-
-**Manual Migration (if Shell not available):**
-
-Create a `scripts/deploy.sh` file and commit it:
-
+Update your **Start Command** to:
 ```bash
-#!/bin/bash
+npm run prisma:migrate -- --skip-generate && npm run seed && npm start
+```
+
+This will:
+- Run migrations automatically on startup
+- Seed test data
+- Start the server
+
+Once deployment completes, the migrations will run automatically on the first start.
+
+**Option 2: If You Have Shell Access**
+
+Click your service → **Shell** tab and run:
+```bash
 npm run prisma:migrate -- --skip-generate
 npm run seed
-npm start
-```
-
-Then update **Start Command** to:
-```bash
-chmod +x scripts/deploy.sh && ./scripts/deploy.sh
-```
-
-**Alternative: Run migrations via API**
-
-After deployment is live, run migrations locally:
-
-```bash
-RENDER_DATABASE_URL="your-render-database-url" npm run prisma:migrate -- --skip-generate
 ```
 
 ### Step 6: Get Your Live URL
@@ -368,11 +359,11 @@ This runs migrations and seeds on every deployment.
 | Step | Action |
 |------|--------|
 | 1 | Connect GitHub repo to Render |
-| 2 | Set Build: `npm install && npm run prisma:generate && npm run build` |
-| 3 | Set Start: `npm start` |
+| 2 | Set Build: `npm install --include=dev && npm run prisma:generate && npm run build` |
+| 3 | Set Start: `npm run prisma:migrate -- --skip-generate && npm run seed && npm start` |
 | 4 | Add 4 environment variables |
 | 5 | Create service and wait for build |
-| 6 | Run migrations if needed |
+| 6 | First start will run migrations automatically |
 | 7 | Test with curl or Postman |
 
 ### Troubleshooting Render Deployment

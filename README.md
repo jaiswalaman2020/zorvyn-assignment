@@ -541,19 +541,18 @@ All inputs are validated using Zod schemas. Validation errors include field-leve
    - Push code to GitHub
    - Connect Render to GitHub repository (render.com)
    - Create Web Service with settings:
-     - **Build Command**: `npm install && npm run prisma:generate && npm run build`
-     - **Start Command**: `npm start`
+     - **Build Command**: `npm install --include=dev && npm run prisma:generate && npm run build`
+     - **Start Command**: `npm run prisma:migrate -- --skip-generate && npm run seed && npm start`
    - Add environment variables:
      - `DATABASE_URL`: Your Supabase connection string
      - `JWT_SECRET`: Strong random string
      - `NODE_ENV`: "production"
      - `PORT`: 3000
 
-3. **Run Migrations**
-   - After deployment, access Shell tab in Render
-   - Run: `npm run prisma:migrate -- --skip-generate && npm run seed`
-
-Your backend will be live at: `https://your-service-name.onrender.com`
+3. **Migrations Run Automatically**
+   - Migrations and seeding run on service startup
+   - No manual migration steps needed
+   - Your backend will be live at: `https://your-service-name.onrender.com`
 
 ## Development Assumptions
 
