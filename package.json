@@ -1,0 +1,49 @@
+{
+  "name": "zorvyn",
+  "version": "1.0.0",
+  "description": "Finance Dashboard Backend with Role-Based Access Control",
+  "main": "dist/index.js",
+  "scripts": {
+    "dev": "ts-node src/index.ts",
+    "dev:watch": "nodemon --exec ts-node src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate dev",
+    "prisma:studio": "prisma studio",
+    "seed": "ts-node prisma/seed.ts",
+    "test": "echo \"Tests not implemented yet\""
+  },
+  "keywords": [
+    "finance",
+    "dashboard",
+    "backend",
+    "express",
+    "prisma",
+    "postgresql"
+  ],
+  "author": "Zorvyn",
+  "license": "MIT",
+  "type": "commonjs",
+  "dependencies": {
+    "@prisma/client": "^5.22.0",
+    "axios": "latest",
+    "bcryptjs": "latest",
+    "cors": "latest",
+    "dotenv": "latest",
+    "express": "latest",
+    "jsonwebtoken": "latest",
+    "prisma": "^5.22.0",
+    "zod": "latest"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "latest",
+    "@types/cors": "^2.8.19",
+    "@types/express": "latest",
+    "@types/jsonwebtoken": "latest",
+    "@types/node": "latest",
+    "nodemon": "latest",
+    "ts-node": "latest",
+    "typescript": "latest"
+  }
+}
