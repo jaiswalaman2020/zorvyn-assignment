@@ -267,7 +267,7 @@ Fill in the deployment form:
 | **Environment** | `Node` |
 | **Region** | Choose closest to you |
 | **Branch** | `main` |
-| **Build Command** | `npm install && npm run build` |
+| **Build Command** | `npm install && npm run prisma:generate && npm run build` |
 | **Start Command** | `npm start` |
 
 ### Step 3: Add Environment Variables
@@ -368,7 +368,7 @@ This runs migrations and seeds on every deployment.
 | Step | Action |
 |------|--------|
 | 1 | Connect GitHub repo to Render |
-| 2 | Set Build: `npm install && npm run build` |
+| 2 | Set Build: `npm install && npm run prisma:generate && npm run build` |
 | 3 | Set Start: `npm start` |
 | 4 | Add 4 environment variables |
 | 5 | Create service and wait for build |

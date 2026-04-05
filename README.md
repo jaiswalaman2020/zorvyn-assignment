@@ -541,7 +541,7 @@ All inputs are validated using Zod schemas. Validation errors include field-leve
    - Push code to GitHub
    - Connect Render to GitHub repository (render.com)
    - Create Web Service with settings:
-     - **Build Command**: `npm install && npm run build`
+     - **Build Command**: `npm install && npm run prisma:generate && npm run build`
      - **Start Command**: `npm start`
    - Add environment variables:
      - `DATABASE_URL`: Your Supabase connection string
